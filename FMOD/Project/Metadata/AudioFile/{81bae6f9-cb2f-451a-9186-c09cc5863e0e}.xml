@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{81bae6f9-cb2f-451a-9186-c09cc5863e0e}">
+		<property name="assetPath">
+			<value>Puzzle-Dreams.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>46.247999999999998</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{8186aa0a-ae93-4ac1-91a7-cafe1d54c018}</destination>
+		</relationship>
+	</object>
+</objects>
