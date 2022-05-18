@@ -12,7 +12,7 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
 
     [Tooltip("The maximum number of players per room.  When a room is full, it can't be joined by new players, and so a new room will be created.")]
     [SerializeField]
-    private byte maxPlayersPerRoom = 4;
+    private byte maxPlayersPerRoom = 6;
     const string playerNamePrefKey = "PlayerName";
 
     [Header("UI")]
@@ -23,6 +23,7 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
     public TMP_Text roomName;
     public List<TMP_Text> playerNames = new List<TMP_Text>();
 
+    #region MonoBehaviour
 
     private void Awake() 
     {
@@ -48,37 +49,16 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         PhotonNetwork.NickName = defaultName;
     }
 
-    public void SetPlayerName(string value)
+    private void Update() 
     {
-        if (string.IsNullOrEmpty(value)) 
-        {
-            Debug.LogError("Player Name is null or empty");
-            return;
-        }
 
-        PhotonNetwork.NickName = value;
-        PlayerPrefs.SetString(playerNamePrefKey, value);
     }
 
-    public void Connect() 
-    {
-        if (PhotonNetwork.IsConnected) 
-        {
-            PhotonNetwork.JoinRandomRoom();
-        }    
-        else 
-        {
-            PhotonNetwork.ConnectUsingSettings();
-            PhotonNetwork.GameVersion = gameVersion;
-        }
-    }
+    #endregion
 
-    public void LeaveRoom() 
-    {
-        PhotonNetwork.LeaveRoom();
-    }
+    #region Photon Callbacks
 
-	public override void OnConnectedToMaster()
+    public override void OnConnectedToMaster()
 	{
         Debug.Log("OnConnectedToMaster() was called by PUN");
 
@@ -127,6 +107,42 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         UpdatePlayerList();
     }
 
+    #endregion
+
+    #region Photon Functionality
+
+    public void SetPlayerName(string value)
+    {
+        if (string.IsNullOrEmpty(value)) 
+        {
+            Debug.LogError("Player Name is null or empty");
+            return;
+        }
+
+        PhotonNetwork.NickName = value;
+        PlayerPrefs.SetString(playerNamePrefKey, value);
+    }
+
+    public void Connect() 
+    {
+        if (PhotonNetwork.IsConnected) 
+        {
+            PhotonNetwork.JoinRandomRoom();
+        }    
+        else 
+        {
+            PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.GameVersion = gameVersion;
+        }
+    }
+
+    public void LeaveRoom() 
+    {
+        PhotonNetwork.LeaveRoom();
+    }
+
+	
+
     private void UpdatePlayerList()
     {
         for (int i = 0; i < playerNames.Count; i++) 
@@ -143,4 +159,12 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
             
         }
     }
+
+    #endregion
+
+    #region Client Functionality
+
+    #endregion
+
+    
 }
