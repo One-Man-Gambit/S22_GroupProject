@@ -29,10 +29,13 @@ public class Party_Game_Prototype_Controller : MonoBehaviour
     {
         // Camera
         {
-            Vector3 camPos = transform.position + (Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up) * CameraOffset);     
+            if (carCam != null) 
+            {
+                Vector3 camPos = transform.position + (Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up) * CameraOffset);     
 
-            Quaternion camRot = Quaternion.Euler(40, transform.eulerAngles.y, 0);
-            carCam.transform.SetPositionAndRotation(camPos, camRot);
+                Quaternion camRot = Quaternion.Euler(40, transform.eulerAngles.y, 0);
+                carCam.transform.SetPositionAndRotation(camPos, camRot);
+            }            
         }
 
         // Motion

@@ -13,8 +13,10 @@ public class FMOD_Test_Manager : MonoBehaviour
     public GameObject ScrollContent;
     public GameObject EventDisplayObject;
 
-    private void Start() {
-
+    private void Start() 
+    {
+        #if UNITY_EDITOR
+        
         foreach (var e in EventManager.Events) {                        
             
             // Instantiation & Reference
@@ -46,5 +48,7 @@ public class FMOD_Test_Manager : MonoBehaviour
             handler.Identity.text = eName + " - " + e.Path;
             handler.Data.text = "0.00";             
         }
+
+        #endif
     }
 }
