@@ -1007,7 +1007,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4206,7 +4206,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6179,6 +6179,8 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
+    - m_Text: 
+      m_Image: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
     - m_Text: 
       m_Image: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
     - m_Text: 
@@ -9221,7 +9223,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -9481,6 +9483,8 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
+    - m_Text: 
+      m_Image: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
     - m_Text: 
       m_Image: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
     - m_Text: 
@@ -13741,7 +13745,7 @@ MonoBehaviour:
   Lobby_Name: {fileID: 1223200264}
   Lobby_RoomListing_Prefrab: {fileID: 5253204330172829824, guid: d04150b5a82001c4dab4fe9b07c27481, type: 3}
   Lobby_RoomList_Content: {fileID: 1543323326}
-  Creation_MaxPlayers: 6
+  Creation_MaxPlayers: 2
   Creation_NameInput: {fileID: 272461194}
   Creation_ErrorDisplay: {fileID: 1137744024}
   Creation_MaxPlayerDropdown: {fileID: 1941045263}
@@ -14825,6 +14829,8 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
+    - m_Text: 
+      m_Image: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
     - m_Text: 
       m_Image: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
     - m_Text: 
@@ -16179,7 +16185,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 38fc0b000b67e0546a7231c6c09c2322, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -16918,6 +16924,8 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: 
+      m_Image: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
+    - m_Text: 
       m_Image: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
     - m_Text: 
       m_Image: {fileID: 21300000, guid: 20fa74423a223514ead056b49f1afc21, type: 3}
@@ -17548,7 +17556,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -18210,7 +18218,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -19659,6 +19667,8 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
+    - m_Text: 
+      m_Image: {fileID: 21300000, guid: 38fc0b000b67e0546a7231c6c09c2322, type: 3}
     - m_Text: 
       m_Image: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
     - m_Text: 
@@ -23084,7 +23094,19 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1145078187}
+        m_TargetAssemblyTypeName: Photon_Test_Manager, Assembly-CSharp
+        m_MethodName: SetMaxPlayers
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &1941045264
 MonoBehaviour:
@@ -23709,6 +23731,8 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
+    - m_Text: 
+      m_Image: {fileID: 21300000, guid: a23430c0ef74ae24a8724cc8cfec9486, type: 3}
     - m_Text: 
       m_Image: {fileID: 21300000, guid: e8fe047c79960494890ec24ee5163d19, type: 3}
     - m_Text: 

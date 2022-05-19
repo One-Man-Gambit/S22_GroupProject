@@ -42,6 +42,9 @@ MonoBehaviour:
   - SetPlayerReady
   - UpdatePlayerList
   - SetReady
+  - LoadGameScene
+  - SpawnPlayer
+  - SyncPlayerLoad
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Photon_Test_Manager : MonoBehaviourPunCallbacks
 {
@@ -38,7 +39,7 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
     public GameObject Lobby_RoomList_Content;
 
     [Header("Room Creation Panel")]
-    public byte Creation_MaxPlayers = 6;
+    public byte Creation_MaxPlayers = 2;
     public TMP_InputField Creation_NameInput;
     public TMP_Text Creation_ErrorDisplay;
     public TMP_Dropdown Creation_MaxPlayerDropdown;
@@ -71,6 +72,8 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
 
     private void Start() 
     {   
+        Status_VersionDisplay.text = gameVersion;
+
         // Grab the player's default name and assign it as default nickname on launch.
         string defaultName = string.Empty;
         if (Login_NameField != null) 
@@ -95,6 +98,7 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
 	{
         Debug.Log("Connected Successfully to Photon");
+        Status_StatusDisplay.text = "Connected to " + PhotonNetwork.CloudRegion;
         SetPanel(Login_Panel);
 
         // Load Player Defaults & Custom Properties
@@ -104,6 +108,7 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         ExitGames.Client.Photon.Hashtable ht = new ExitGames.Client.Photon.Hashtable();
         ht.Add("Floaty", floatyID);
         ht.Add("Color", colorID);
+        ht.Add("IsReady", false);
         PhotonNetwork.LocalPlayer.SetCustomProperties(ht);
 	}
 
@@ -116,6 +121,8 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
 	public override void OnJoinedLobby()
 	{
 		Debug.Log("Connected Successfully to Lobby " + ((PhotonNetwork.CurrentLobby.IsDefault) ? "Default" : PhotonNetwork.CurrentLobby.Name));
+        Status_StatusDisplay.text = "Connected to " + ((PhotonNetwork.CurrentLobby.IsDefault) ? "Default" : PhotonNetwork.CurrentLobby.Name);
+
 
         // Refresh Room List
         RefreshLobbyRooms();
@@ -138,7 +145,8 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
 
 	public override void OnJoinedRoom()
 	{
-        Debug.Log("OnJoinedRoom() called by PUN.  Now this client is in a room. \nUpdating Player List.");        
+        Debug.Log("OnJoinedRoom() called by PUN.  Now this client is in a room. \nUpdating Player List.");    
+        Status_StatusDisplay.text = "Connected to " + PhotonNetwork.CurrentRoom.Name;    
         SetPanel(Room_Panel);
 
         // Update the player list
@@ -149,7 +157,11 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
 	public override void OnLeftRoom()
 	{
 		Debug.Log("OnLeftRoom() called by PUN.  This client is no longer in a room.");
-        //RoomPanel.SetActive(false);
+        
+        // Set player ready to false by default
+        ExitGames.Client.Photon.Hashtable ht = new ExitGames.Client.Photon.Hashtable();
+        ht.Add("IsReady", false);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(ht);
 	}
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -181,6 +193,7 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         
         // Connect to Master Server
         Debug.Log("Connecting to Photon.");
+        Status_StatusDisplay.text = "Connecting to Photon";
         PhotonNetwork.ConnectUsingSettings();
     }
 
@@ -281,6 +294,14 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinRandomRoom();
     }
 
+    public void SetMaxPlayers()
+    {
+        // +2 because value index value begins at 0 and increments by 1 each option.
+        // This method will not work if the options are not incremental by 1.
+        Creation_MaxPlayers = (byte)(Creation_MaxPlayerDropdown.value + 2);
+        Debug.Log("Max Players:" + Creation_MaxPlayers);
+    }
+
     public void CreateRoom() 
     {
         // If name is blank, display an error to notify player
@@ -295,6 +316,8 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         roomOptions.MaxPlayers = Creation_MaxPlayers;
         roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { {MAP_PROP_KEY, "Sandbox"}, { GAME_MODE_PROP_KEY, "Testing"} };
         PhotonNetwork.CreateRoom(Creation_NameInput.text, roomOptions, TypedLobby.Default);
+
+        //Debug.Log("Maximum Players In Newly Created Room: " + roomOptions.MaxPlayers);
     }
 
     public void LeaveRoom() 
@@ -334,11 +357,8 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         {
             // Enable the ready tag for only the local player
             if (player.Value == PhotonNetwork.LocalPlayer) 
-            {    
-                
-                int newFloaty = Room_PlayerFloatySelector[index].value;
-                Debug.Log("New Floaty:" + newFloaty);
-
+            {                    
+                int newFloaty = Room_PlayerFloatySelector[index].value;               
                 PlayerPrefs.SetInt("Floaty", newFloaty);                
                 ExitGames.Client.Photon.Hashtable ht = new ExitGames.Client.Photon.Hashtable();
                 ht.Add("Floaty", newFloaty);
@@ -353,37 +373,45 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
         photonView.RPC("UpdatePlayerList", RpcTarget.Others);
     }
 
-    public void SetPlayerReady()
-    {
-        PhotonView photonView = PhotonView.Get(this);
-        photonView.RPC("SetReady", RpcTarget.All);
-    }    
-
-    [PunRPC]
-    private void SetReady()
+    private void SetPlayerReady()
     {   
         // Loop through list of players in the room.
         int index = 0;
+        int readyCount = 0;
         foreach (var player in PhotonNetwork.CurrentRoom.Players) 
         {
             // Enable the ready tag for only the local player
             if (player.Value == PhotonNetwork.LocalPlayer) {
-                Room_PlayerReady[index].gameObject.SetActive(!Room_PlayerReady[index].gameObject.activeInHierarchy);
+                bool state = Room_PlayerReady[index].gameObject.activeInHierarchy;                                               
+                Room_PlayerReady[index].gameObject.SetActive(!state);
+                ExitGames.Client.Photon.Hashtable ht = new ExitGames.Client.Photon.Hashtable();
+                ht.Add("IsReady", !state);
+                PhotonNetwork.LocalPlayer.SetCustomProperties(ht);
             } 
+            
+            // Add to ready counter
+            if (Room_PlayerReady[index].gameObject.activeInHierarchy) {
+                readyCount++;
+            }
 
             index++;
-        } 
+        }         
 
         // Update the player list
         PhotonView photonView = PhotonView.Get(this);
-        photonView.RPC("UpdatePlayerList", RpcTarget.All);
+        photonView.RPC("UpdatePlayerList", RpcTarget.Others);
+    
+        // If everyone is ready, begin the game.
+        if (readyCount >= PhotonNetwork.CurrentRoom.PlayerCount) {
+            photonView.RPC("LoadGameScene", RpcTarget.All);
+        }
     }
 
     [PunRPC]
     private void UpdatePlayerList()
     {
         // Toggle off all Player Panels
-        for (int i = 0; i < PhotonNetwork.CurrentRoom.MaxPlayers; i++)
+        for (int i = 0; i < 6; i++)
         {
             Room_PlayerPanels[i].SetActive(false);
         }
@@ -399,6 +427,7 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
             //Debug.Log((int)player.Value.CustomProperties["Floaty"]);
             Room_PlayerFloatySelector[index].value = (int)player.Value.CustomProperties["Floaty"];
             Room_PlayerColorSelector[index].value = (int)player.Value.CustomProperties["Color"];
+            Room_PlayerReady[index].gameObject.SetActive((bool)player.Value.CustomProperties["IsReady"]);            
 
             // Disable Load Selectors for all players except the local player.
             if (player.Value != PhotonNetwork.LocalPlayer)
@@ -412,8 +441,15 @@ public class Photon_Test_Manager : MonoBehaviourPunCallbacks
 
             index++;
         } 
+    }
 
-        Debug.Log("Player List Updated");
+    [PunRPC]
+    public void LoadGameScene()
+    {
+        Debug.Log("Loading Game Scene");
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;            
+        PhotonNetwork.LoadLevel(1);
     }
 
     #endregion
