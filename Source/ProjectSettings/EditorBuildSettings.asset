@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Photon Test/Photon_Test.unity
+    path: Assets/Scenes/Prototypes/Fusion Test/Fusion_Test.unity
+    guid: 811014da44f8f2a449b7ab4f9ec07716
+  - enabled: 0
+    path: Assets/Scenes/Prototypes/Photon Test/Photon_Test.unity
     guid: b9c74d216c7df3b4bb8924684f022a07
-  - enabled: 1
-    path: Assets/Scenes/Photon Test/Photon_Test_Gameplay.unity
+  - enabled: 0
+    path: Assets/Scenes/Prototypes/Photon Test/Photon_Test_Gameplay.unity
     guid: 6800753673dce9248bdcaaf19441d715
   m_configObjects: {}
