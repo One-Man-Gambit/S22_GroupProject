@@ -6,6 +6,9 @@ public class PlayerController : MonoBehaviour
 {   
     // Game Manager Reference
     GameManager _gm; 
+    public Checkpoint CurrentCheckpoint;
+    public bool IsDummyPuck = false;
+    
 
     [Header("Components")]
     public Camera carCam;
@@ -17,14 +20,23 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 CameraOffset = Vector3.zero;
 
+    [Header("Player Variables")]
+    public int currentLap;
+    public int checkpointCounter;
+    public List<bool> checkPointsCompleted;
+
     [Header("Private Variables")]
-    [SerializeField]
-    private float rbVelocity = 0;
+    [SerializeField] private float rbVelocity = 0;    
+
+    
 
     private void Awake() 
     {   
         // Find the game manager within the scene.  Should consider using singleton format instead.
         _gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        // Find the finish line and grab the checkpoint class from it
+        CurrentCheckpoint = GameObject.Find("FinishLine").GetComponent<Checkpoint>();
     }
 
     private void Start() 
@@ -34,7 +46,10 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Update()
-    {        
+    {       
+        // Too lazy to create a separate class to handle player data.  So we'll just use this class and a temp bool check to disable controls
+        if (IsDummyPuck) return;
+
         // Camera
         {
             if (carCam != null) 
@@ -75,5 +90,49 @@ public class PlayerController : MonoBehaviour
             }
 
         }
+    }
+
+    private void OnTriggerEnter(Collider other) 
+    {   
+        if (other.gameObject.tag == "Checkpoint") {
+            // Get a reference to the checkpoint script
+            Checkpoint cp = other.gameObject.GetComponent<Checkpoint>();
+            
+            // If a checkpoint hasn't been initialized, set the checkpoint.
+            if (CurrentCheckpoint == null) {
+                CurrentCheckpoint = cp;                
+            } 
+            
+            // If the checkpoint is the current checkpoint's next checkpoint, set the checkpoint.
+            // This prevents going in reverse or backtracking for points.
+            else if (CurrentCheckpoint.NextCheckpoint == cp) {
+                CurrentCheckpoint = cp;
+                checkpointCounter++;
+            }
+
+            // Activate the specified checkpoint
+            checkPointsCompleted[cp.index] = true;      
+            _gm.OnLapCompleted(this);       
+            
+            // Check if lap is completed
+            // Check if all checkpoints have been activated
+            bool lapComplete = true;  
+            for (int i = 0; i < checkPointsCompleted.Count; i++) {
+                if (!checkPointsCompleted[i]) {
+                    lapComplete = false;
+                }
+            }
+
+            // If not all checkpoints were activated, then lap is not awarded.
+            if (!lapComplete) return;
+
+            // Increment Lap Counter
+            currentLap++;
+
+            // Reset all Checkpoints
+            for (int i = 0; i < checkPointsCompleted.Count; i++) {
+                checkPointsCompleted[i] = false;
+            }            
+        }    
     }
 }

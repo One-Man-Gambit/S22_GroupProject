@@ -6,6 +6,8 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public PlayerController playerRef;
+
     public GameSettings Settings;
     public List<GameObject> CheckPoints = new List<GameObject>();
     public TMP_Text StartCountdownDisplay;   
@@ -15,12 +17,13 @@ public class GameManager : MonoBehaviour
     public bool RaceHasStarted;
     public bool RaceHasFinished;
 
+    public List<PlayerController> Players = new List<PlayerController>();
+
     [Header("Private Variables")]
     [SerializeField] private float time;
-    [SerializeField] private int currentLap;
+    //[SerializeField] private int currentLap; // moved to playercontroller
     [SerializeField] private float countdownTimer = 5;    
-    [SerializeField] private  List<bool> checkPointsCompleted;
-
+    
     private void Awake() 
     {   
         // To be decided upon by the menu scene.  This is only temporary
@@ -31,10 +34,16 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start() 
-    {
-        checkPointsCompleted = new List<bool>();
-        for (int i = 0; i < CheckPoints.Count; i++) {
-            checkPointsCompleted.Add(false);
+    {        
+        
+        for (int i = 0; i < Players.Count; i++) {
+            Players[i].currentLap = 1;
+            Players[i].checkpointCounter = 0;
+
+            Players[i].checkPointsCompleted = new List<bool>();
+            for (int j = 0; j < CheckPoints.Count; j++) {
+                Players[i].checkPointsCompleted.Add(false);
+            }
         }
 
         StartCoroutine("StartRace");
@@ -42,6 +51,9 @@ public class GameManager : MonoBehaviour
 
     private void Update() 
     {   
+        // Sort Leaderboard
+        SortLeaderboard();
+
         // If race has not started yet, perform the countdown.
         if (!RaceHasStarted) {
             countdownTimer -= Time.deltaTime;
@@ -92,6 +104,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator StartRace() 
     {
+        Debug.Log("Start Race Called!");
+
         // Initialize the time limit based on GameSettings
         if (Settings.TimeLimit > 0) {            
             time = Settings.TimeLimit;
@@ -114,10 +128,10 @@ public class GameManager : MonoBehaviour
 
         // Initialize the lap requirement based on GameSettings
         if (Settings.LapLimit > 0) {
-            currentLap = 1;
+            playerRef.currentLap = 1;
 
             // Update the UI for Lap Display
-            GameLapDisplay.text = "Lap: " + currentLap.ToString();
+            GameLapDisplay.text = "Lap: " + playerRef.currentLap.ToString();
         } 
         
         // If there is no lap limit, just turn off the UI display.
@@ -130,30 +144,64 @@ public class GameManager : MonoBehaviour
         RaceHasStarted = true;
     }
 
-    public void OnLapCompleted() 
-    {   
-        // Check if all checkpoints have been activated
-        bool lapComplete = true;  
-        for (int i = 0; i < checkPointsCompleted.Count; i++) {
-            if (!checkPointsCompleted[i]) {
-                lapComplete = false;
+    public void SortLeaderboard()
+    {
+        // Player with highest lap comes first, followed by highest checkpoint, followed by closest distance to next checkpoint.        
+        List<PlayerController> pc = new List<PlayerController>();
+ 
+        //Debug.Log("Distance Player: " + Vector3.Distance(playerRef.gameObject.transform.position, playerRef.CurrentCheckpoint.NextCheckpoint.gameObject.transform.position));
+        //Debug.Log("Distance First: " + Vector3.Distance(Players[0].gameObject.transform.position, Players[0].CurrentCheckpoint.NextCheckpoint.gameObject.transform.position));
+
+        for (int i = 0; i < Players.Count; i++) {
+                        
+            PlayerController best = null;            
+
+            for (int j = 0; j < Players.Count; j++) {                
+                
+                PlayerController current = Players[j];
+
+                if (pc.Contains(current)) continue;
+
+                // If there are no best in slot decided yet, then set current as best.
+                if (best == null) { 
+                    best = current;
+                }
+ 
+                // Store distance to next checkpoint for later
+                float currentDist = Vector3.Distance(current.gameObject.transform.position, current.CurrentCheckpoint.NextCheckpoint.gameObject.transform.position);
+                float bestDist = Vector3.Distance(best.gameObject.transform.position, best.CurrentCheckpoint.NextCheckpoint.gameObject.transform.position);                 
+
+                // Check if lap is greater than best.
+                if (current.currentLap > best.currentLap) {
+                    Debug.Log("Lap is greater");
+                    best = current;
+                }
+
+                // Check if current's checkpoint is greater than best's checkpoint
+                else if (current.currentLap == best.currentLap && current.checkpointCounter > best.checkpointCounter) {
+                    Debug.Log("Checkpoint is greater");
+                    best = current;
+                }
+
+                // Check if current's distance to next checkpoint is closer than best's distance to next checkpoint
+                else if (current.currentLap == best.currentLap && current.CurrentCheckpoint == best.CurrentCheckpoint && currentDist < bestDist) {
+                    Debug.Log("Distance is closer");
+                    best = current;
+                } 
             }
+
+            pc.Add(best);
         }
 
-        // If not all checkpoints were activated, then lap is not awarded.
-        if (!lapComplete) return;
+        Players = pc;
+    }
 
-        // Increment Lap Counter
-        currentLap++;
-        GameLapDisplay.text = "Lap: " + currentLap.ToString();
-
-        // Reset all Checkpoints
-        for (int i = 0; i < checkPointsCompleted.Count; i++) {
-            checkPointsCompleted[i] = false;
-        }
+    public void OnLapCompleted(PlayerController pc) 
+    {   
+        GameLapDisplay.text = "Lap: " + pc.currentLap.ToString();
 
         // If the last lap is complete, end the game.
-        if (currentLap > Settings.LapLimit) {
+        if (pc.currentLap > Settings.LapLimit) {
             // Game End
             GameLapDisplay.text = "Finished!";
             RaceHasFinished = true;
@@ -162,7 +210,6 @@ public class GameManager : MonoBehaviour
 
     public void OnCheckpointCompleted(int index) 
     {
-        // Activate the specified checkpoint
-        checkPointsCompleted[index] = true;
+              
     }
 }
