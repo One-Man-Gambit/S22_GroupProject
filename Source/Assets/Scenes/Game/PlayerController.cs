@@ -28,6 +28,9 @@ public class PlayerController : MonoBehaviour
     [Header("Private Variables")]
     [SerializeField] private float rbVelocity = 0;    
 
+    // Temporary Ability Holder
+    private List<Ability> Abilities = new List<Ability>();
+
     
 
     private void Awake() 
@@ -43,6 +46,13 @@ public class PlayerController : MonoBehaviour
     {   
         // Grab the rigidbody component from the object
         rb = GetComponent<Rigidbody>();
+
+        // **TEMP** Load in abilities
+        Abilities.Add(ScriptableObject.CreateInstance<Fishing_Rod>());
+        Abilities.Add(ScriptableObject.CreateInstance<Harpoon>());
+        Abilities.Add(ScriptableObject.CreateInstance<Freeze_Ray>());
+        Abilities.Add(ScriptableObject.CreateInstance<Motor_Boost>());
+        Abilities.Add(ScriptableObject.CreateInstance<Air_Blast>());
     }
 
     private void Update()
@@ -90,6 +100,45 @@ public class PlayerController : MonoBehaviour
             }
 
         }
+
+        // ** TEMP ** Ability Activation
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) { ActivateAbility(0); }
+
+            if (Input.GetKeyDown(KeyCode.Alpha2)) { ActivateAbility(1); }
+
+            if (Input.GetKeyDown(KeyCode.Alpha3)) { ActivateAbility(2); }
+
+            if (Input.GetKeyDown(KeyCode.Alpha4)) { ActivateAbility(3); }
+
+            if (Input.GetKeyDown(KeyCode.Alpha5)) { ActivateAbility(4); }
+        }
+    }
+
+    private void ActivateAbility(int index) {
+        AbilitySettings settings = null;  
+        Vector3 direction = transform.forward;
+        Ray screenRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        switch (Abilities[index].GetTargetingType()) {                   
+            case AbilityTargetingType.Directional:                    
+                if (Physics.Raycast(screenRay, out RaycastHit dir_hit, 75)) {			
+                    settings = AbilitySettings.InitializeDirectionalCast(this, (dir_hit.point - transform.position).normalized, Abilities[index].GetRange());    
+                    direction = (dir_hit.point - transform.position).normalized;
+                }                        
+                break;
+            case AbilityTargetingType.Positional:
+                if (Physics.Raycast(screenRay, out RaycastHit pos_hit, 75)) {			
+                    settings = AbilitySettings.InitializePositionalCast(this, pos_hit.point);   
+                    direction = (pos_hit.point - transform.position).normalized;;
+                }                    
+                break;
+            default:
+            case AbilityTargetingType.Self:
+                settings = AbilitySettings.InitializeSelfCast(this);
+                break;
+        }
+        
+        Abilities[index].Cast(settings);
     }
 
     private void OnTriggerEnter(Collider other) 
